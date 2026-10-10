@@ -16,9 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from myapp.views import hello
+from myapp.views import hello, hello_with_age
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/hello", hello),
+    path("api/hello/<str:name>", hello),
+    path("api/hello/<str:name>/<int:age>", hello_with_age),
 ]
