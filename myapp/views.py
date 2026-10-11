@@ -1,3 +1,5 @@
+import json
+from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 
 
@@ -33,3 +35,10 @@ def status_view(request, code):
         return JsonResponse({"message": "Bad request"}, status=400)
     if code == 404:
         return JsonResponse({"message": "Not found"}, status=404)
+
+@csrf_exempt
+def echo(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        return JsonResponse(data)
+    return JsonResponse({"message": "Only POST can send request"}, status=400)
