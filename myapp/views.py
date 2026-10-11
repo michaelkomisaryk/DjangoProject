@@ -12,3 +12,16 @@ def hello_with_age(request, name, age):
         "message": f"Hello, {name}",
         "age": age
     })
+
+def greeting(request):
+    name= request.GET.get("name", "Guest")
+    uppercase = request.GET.get("uppercase", "false")
+
+    message = f"Hello, {name}"
+
+    if uppercase.lower() == "true":
+        message = message.upper()
+
+    return JsonResponse({
+        "message": message
+    })
