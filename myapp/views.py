@@ -25,3 +25,11 @@ def greeting(request):
     return JsonResponse({
         "message": message
     })
+
+def status_view(request, code):
+    if code == 200:
+        return JsonResponse({"message": "Request successful"}, status=200)
+    if code == 400:
+        return JsonResponse({"message": "Bad request"}, status=400)
+    if code == 404:
+        return JsonResponse({"message": "Not found"}, status=404)
