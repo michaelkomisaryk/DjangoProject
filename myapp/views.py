@@ -1,3 +1,4 @@
+
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
@@ -40,5 +41,22 @@ def status_view(request, code):
 def echo(request):
     if request.method == "POST":
         data = json.loads(request.body)
+
+        if not isinstance(data, dict):
+            return JsonResponse({"error": "Invalid data"}, status=400)
+
+        title = data.get("title")
+
+        if not isinstance(title, str) or not title.strip():
+            return JsonResponse({"error": "Title is required"}, status=400)
+
+        if len(title) >= 100:
+            return JsonResponse({"error": "Title must be shorter than 100 characters"}, status=400)
+
+        description = data.get("description")
+
+        if not isinstance(description, str) or not description.strip():
+            return JsonResponse({"error": "Description is required"}, status=400)
+
         return JsonResponse(data)
     return JsonResponse({"message": "Only POST can send request"}, status=400)
