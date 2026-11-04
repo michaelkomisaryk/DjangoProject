@@ -60,3 +60,36 @@ def echo(request):
 
         return JsonResponse(data)
     return JsonResponse({"message": "Only POST can send request"}, status=400)
+
+tasks = []
+
+def task_list(request):
+    if request.method == "GET":
+        return JsonResponse({
+            "tasks": tasks
+        })
+
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+        if not isinstance(data, dict):
+            return JsonResponse({"error": "Invalid data"}, status=400)
+
+        title = data.get("title")
+
+        if not isinstance(title, str) or not title.strip():
+            return JsonResponse({"error": "Title is required"}, status=400)
+
+        task = {
+            "id": len(tasks) + 1,
+            "title": title.strip()
+        }
+
+        tasks.append(task)
+
+        return JsonResponse(task, status=201)
+
+    return JsonResponse({"error": "Method not allowed"}, status=405)
