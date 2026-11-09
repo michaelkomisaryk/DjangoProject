@@ -25,5 +25,5 @@ urlpatterns = [
     path("api/greeting", greeting),
     path("api/status/<int:code>", status_view),
     path("api/echo", echo),
-    path("tasks/", task_list),
+    path("api/tasks", task_list),
 ]

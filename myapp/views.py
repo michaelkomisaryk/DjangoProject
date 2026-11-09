@@ -1,4 +1,4 @@
-
+from .models import Task
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
@@ -63,10 +63,22 @@ def echo(request):
 
 tasks = []
 
+@csrf_exempt
 def task_list(request):
     if request.method == "GET":
+        tasks = Task.objects.all()
+
         return JsonResponse({
-            "tasks": tasks
+            "tasks": [
+                {
+                    "id": task.id,
+                    "title": task.title,
+                    "description": task.description,
+                    "completed": task.completed,
+                    "created_at": task.created_at
+                }
+                for task in tasks
+            ]
         })
 
     if request.method == "POST":
@@ -79,17 +91,31 @@ def task_list(request):
             return JsonResponse({"error": "Invalid data"}, status=400)
 
         title = data.get("title")
+        description = data.get("description", "")
 
         if not isinstance(title, str) or not title.strip():
             return JsonResponse({"error": "Title is required"}, status=400)
 
-        task = {
-            "id": len(tasks) + 1,
-            "title": title.strip()
-        }
+        if not isinstance(description, str):
+            return JsonResponse({"error": "Invalid description"}, status=400)
 
-        tasks.append(task)
+        task = Task.objects.create(
+            title=title.strip(),
+            description=description.strip()
+        )
 
-        return JsonResponse(task, status=201)
+        return JsonResponse({
+            "id": task.id,
+            "title": task.title,
+            "description": task.description,
+            "completed": task.completed,
+            "created_at": task.created_at
+        }, status=201)
 
-    return JsonResponse({"error": "Method not allowed"}, status=405)
+    return JsonResponse(
+        {"error": "Method not allowed"},
+        status=405
+    )
+
+
+
