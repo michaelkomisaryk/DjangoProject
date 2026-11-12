@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from myapp.views import hello, hello_with_age, greeting, status_view, echo, task_list
+from myapp.views import hello, hello_with_age, greeting, status_view, echo, task_list, task_detail
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -26,4 +26,5 @@ urlpatterns = [
     path("api/status/<int:code>", status_view),
     path("api/echo", echo),
     path("api/tasks", task_list),
+    path("api/tasks/<int:task_id>", task_detail),
 ]

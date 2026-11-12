@@ -118,4 +118,68 @@ def task_list(request):
     )
 
 
+@csrf_exempt
+def task_detail(request, task_id):
+    try:
+        task = Task.objects.get(id=task_id)
+    except Task.DoesNotExist:
+        return JsonResponse({"error": "Task not found"}, status=404)
+
+    if request.method == "GET":
+        return JsonResponse({
+            "id": task.id,
+            "title": task.title,
+            "description": task.description,
+            "completed": task.completed,
+            "created_at": task.created_at.isoformat()
+        })
+
+    if request.method == "PUT":
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+        if not isinstance(data, dict):
+            return JsonResponse({"error": "Invalid data"}, status=400)
+
+        title = data.get("title", task.title)
+        description = data.get("description", task.description)
+        completed = data.get("completed", task.completed)
+
+        if not isinstance(title, str) or not title.strip():
+            return JsonResponse({"error": "Title is required"}, status=400)
+
+        if len(title.strip()) >= 100:
+            return JsonResponse({"error": "Title must be shorter than 100 characters"}, status=400)
+
+        if not isinstance(description, str):
+            return JsonResponse({"error": "Invalid description"}, status=400)
+
+        if not isinstance(completed, bool):
+            return JsonResponse({"error": "Invalid completed value"}, status=400)
+
+        task.title = title.strip()
+        task.description = description.strip()
+        task.completed = completed
+        task.save()
+
+        return JsonResponse({
+            "message": "Task updated successfully",
+            "id": task.id,
+            "title": task.title,
+            "description": task.description,
+            "completed": task.completed,
+            "created_at": task.created_at.isoformat()
+        })
+
+    if request.method == "DELETE":
+        task.delete()
+
+        return JsonResponse({
+            "message": "Task deleted successfully"
+        })
+
+    return JsonResponse({"error": "Method not allowed"}, status=405)
+
 
